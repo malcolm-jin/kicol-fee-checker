@@ -38,7 +38,11 @@ def find_sessions(is_min_mode: bool, rate: int, weeks: float):
     return SEARCH_MAX_SESSIONS, False, 0, 0, 0
 
 # ====== 2. 웹 화면 구성 (UI) ======
-st.set_page_config(page_title="키즈스콜레 리딩클럽 교습비 계산기", layout="centered")
+st.set_page_config(
+    page_title="키즈스콜레 리딩클럽 교습비 계산기",
+    page_icon="logo.png",
+    layout="centered"
+)
 
 st.title("키즈스콜레 리딩클럽 교습비 계산기")
 
