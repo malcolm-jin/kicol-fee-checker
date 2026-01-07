@@ -1,7 +1,7 @@
 import streamlit as st
 
 # 1. 대표님이 찾으신 이미지 주소 (보안상 직접 입력)
-LOGO_URL = "https://github.com/malcolm-jin/kicol-fee-checker/blob/main/logo.png?raw=true"
+LOGO_URL = "https://github.com/malcolm-jin/kicol-fee-checker/blob/main/logo.png?raw=true&v=2"
 
 # 2. 웹 앱 설정 (상단 탭 아이콘 변경)
 st.set_page_config(
@@ -14,8 +14,9 @@ st.set_page_config(
 # 이 코드가 있어야 휴대폰이 '돛단배' 대신 대표님의 로고를 아이콘으로 사용합니다.
 st.markdown(f"""
     <head>
+        <link rel="icon" type="image/png" href="{LOGO_URL}">
         <link rel="apple-touch-icon" href="{LOGO_URL}">
-        <link rel="icon" href="{LOGO_URL}">
+        <link rel="shortcut icon" type="image/png" href="{LOGO_URL}">
     </head>
     """, unsafe_allow_html=True)
 
