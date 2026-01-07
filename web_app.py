@@ -1,5 +1,6 @@
 import streamlit as st
 
+# ====== 고정 값 및 로직 설정 ====== [cite: 711]
 LESSON_MINUTES = 45
 MONTHLY_FEE_WON = 110_000
 SEARCH_MAX_SESSIONS = 20
@@ -16,7 +17,7 @@ def eval_min(rate: int, weeks: float, sessions: int):
     per_hour = per_min * 60
     max_fee = rate * mins
     ok = max_fee >= MONTHLY_FEE_WON
-    return ok, per_min, per_hour, max_fee
+    return ok, per_min, per_hour, max_fee [cite: 711]
 
 def eval_hour(rate: int, weeks: float, sessions: int):
     hours = weeks * sessions * (LESSON_MINUTES / 60)
@@ -24,7 +25,7 @@ def eval_hour(rate: int, weeks: float, sessions: int):
     per_min = per_hour / 60
     max_fee = rate * hours
     ok = max_fee >= MONTHLY_FEE_WON
-    return ok, per_min, per_hour, max_fee
+    return ok, per_min, per_hour, max_fee [cite: 712]
 
 def find_sessions(is_min_mode: bool, rate: int, weeks: float):
     for s in range(1, SEARCH_MAX_SESSIONS + 1):
@@ -34,20 +35,20 @@ def find_sessions(is_min_mode: bool, rate: int, weeks: float):
             ok, per_min, per_hour, max_fee = eval_hour(rate, weeks, s)
         if ok:
             return s, ok, per_min, per_hour, max_fee
-    return SEARCH_MAX_SESSIONS, ok, per_min, per_hour, max_fee
+    return SEARCH_MAX_SESSIONS, ok, per_min, per_hour, max_fee [cite: 713]
 
+# ====== UI 구성 ====== [cite: 713]
 st.set_page_config(page_title="키즈스콜레 리딩클럽 교습비 계산기", layout="centered")
 
 st.title("키즈스콜레 리딩클럽 교습비 계산기")
 
 st.markdown(
 """
-**<사용 방법>**  
-① 관할 교육지원청 연락하여 '교습과정의 교습비 단가'와 '1개월 주 환산 값' 찾기  
+**<사용 방법>** ① 관할 교육지원청 연락하여 '교습과정의 교습비 단가'와 '1개월 주 환산 값' 찾기  
 ② 아래 입력 후 **판정하기** 클릭  
 ③ TYPE 1 및 TYPE 2 참고하여 신고서에 작성
 """
-)
+) [cite: 714]
 
 mode = st.radio("계산 방식", ["분당 단가 기준(원/분)", "시간당 단가 기준(원/시간)"], horizontal=True)
 is_min = mode.startswith("분당")
@@ -55,7 +56,19 @@ is_min = mode.startswith("분당")
 rate = st.text_input("① 최대 단가 입력", placeholder="분당: 1~999 / 시간당: 1000 이상")
 weeks = st.text_input("② 한 달 주 환산 수", placeholder="예: 4, 4.2, 4.3, 4.5")
 
-if st.button("판정하기"):
+# ✅ 버튼 레이아웃 수정: 판정하기와 다시 계산하기를 나란히 배치
+col1, col2 = st.columns(2)
+
+with col1:
+    btn_calc = st.button("판정하기", use_container_width=True)
+
+with col2:
+    # 다시 계산하기 버튼: 클릭 시 페이지를 새로고침하여 초기 상태로 되돌림
+    if st.button("다시 계산하기", use_container_width=True):
+        st.rerun()
+
+# 판정 로직 실행 [cite: 715]
+if btn_calc:
     try:
         rate_val = int(rate.replace(",", "").strip())
         weeks_val = float(weeks.replace(",", "").strip())
@@ -72,19 +85,23 @@ if st.button("판정하기"):
     else:
         if rate_val < 1000:
             st.error("시간당 단가 기준일 때는 ① 최대 단가는 1000 이상만 입력 가능합니다.")
-            st.stop()
+            st.stop() [cite: 716]
 
     sessions, ok, per_min, per_hour, max_fee = find_sessions(is_min, rate_val, weeks_val)
 
+    # 결과 출력 [cite: 717]
+    st.markdown("---")
     st.subheader("신고서 작성용")
-    type1 = f"TYPE 1\n월 {fmt_won(MONTHLY_FEE_WON)}\n시간 당 {fmt_won(round(per_hour))}"
-    type2 = f"TYPE 2\n월 {fmt_won(MONTHLY_FEE_WON)}\n({LESSON_MINUTES}분 * {sessions}회 * {fmt_num(weeks_val)}주)"
+    
+    # 굵게 강조 처리 (HTML 사용)
+    type1 = f"**TYPE 1**\n\n월 {fmt_won(MONTHLY_FEE_WON)}\n\n시간 당 {fmt_won(round(per_hour))}"
+    type2 = f"**TYPE 2**\n\n월 {fmt_won(MONTHLY_FEE_WON)}\n\n({LESSON_MINUTES}분 * {sessions}회 * {fmt_num(weeks_val)}주)"
 
-    st.code(type1, language=None)
-    st.code(type2, language=None)
+    st.info(type1)
+    st.info(type2)
 
     st.subheader("판정 상세")
-    st.write(f"- 결과: {'신고 가능' if ok else '조정 필요'}")
+    st.write(f"- 결과: **{'신고 가능' if ok else '조정 필요'}**")
     st.write(f"- 한 달 주 환산 수: {fmt_num(weeks_val)}주")
     st.write(f"- 주 수업수(자동): {sessions}회")
     st.write(f"- 현재 분당 단가: {per_min:.2f}원/분")
