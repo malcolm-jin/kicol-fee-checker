@@ -1,5 +1,24 @@
 import streamlit as st
 
+# 1. 대표님이 찾으신 이미지 주소 (보안상 직접 입력)
+LOGO_URL = "https://github.com/malcolm-jin/kicol-fee-checker/blob/main/logo.png?raw=true"
+
+# 2. 웹 앱 설정 (상단 탭 아이콘 변경)
+st.set_page_config(
+    page_title="키즈스콜레 리딩클럽 교습비 계산기",
+    page_icon=LOGO_URL, 
+    layout="centered"
+)
+
+# 3. 중요: 휴대폰(갤럭시/아이폰) 홈 화면 아이콘을 강제로 고정하는 코드
+# 이 코드가 있어야 휴대폰이 '돛단배' 대신 대표님의 로고를 아이콘으로 사용합니다.
+st.markdown(f"""
+    <head>
+        <link rel="apple-touch-icon" href="{LOGO_URL}">
+        <link rel="icon" href="{LOGO_URL}">
+    </head>
+    """, unsafe_allow_html=True)
+
 # ====== 1. 고정 값 및 로직 설정 ======
 LESSON_MINUTES = 45
 MONTHLY_FEE_WON = 110_000
